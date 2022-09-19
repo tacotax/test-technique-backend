@@ -1,4 +1,4 @@
-# Tacotax - Backend technical test
+# Climb - Backend technical test
 ## Summary
 1. Objective
 2. Technologies
@@ -6,68 +6,57 @@
 4. Next steps
 
 ## Objective :
-The main goal is to create a service that would allow us to upload a questionnaire and retrieve its data in JSON format.
-In real life these data would be used to build the following [service](https://www.tacotax.fr/defiscalisation/slider)
+The main goal is to create a service that would allow us to upload a questionnaire structure in YAML and retrieve this data in JSON format.
+In real life these data would be used to build the following questionnaire [service](https://www.weareclimb.fr/analyse-defiscalisation)
 
 Tasks :
 
-1. Make an API endpoint that can receive a JSON payload and store it
-2. Make an API endpoint to retrieve the uploaded JSON
+1. Make a page to upload a YAML file
+2. Make an API endpoint to retrieve the uploaded content in JSON format
 3. Implement validations over the content
-4. Alternative way to upload the data through YAML
-5. Write some RSPEC test to cover at least one endpoint behaviour
+4. Write some RSPEC test to cover at least one endpoint behaviour
 
 
 ## Technologies :
-Ruby on Rails
-Database choice is up to preference
-Rspec for unit tests
+Ruby on Rails.
+Database choice is up to preference.
+Rspec for tests.
 
 
-## Tasks details :
+## Specs :
+### Upload
+* Upload page, `GET localhost:3000/questionnaires/new` with the possibility to chose the file to upload
+* POST `localhost:3000/questionnaires` with chose file
+* Validate questionnaire format and structure
+* If questionnaire is valid redirect to upload page with flash message `L'upload du questionnaire a réussi`
+* If questionnaire is invalid redirect to upload page with the list of errors as an error message
 
-### 1. Make an API endpoint that can receive a JSON payload and store it
+### Element types
+* questionnaire :  
+  root element, its reference will be used to retrive data through the `GET localhost:3000/questionnaires/:reference` endpoint.  
+  Validate presence of reference and content
+* slide :  
+  represents a "page" of a questionnaire
+  validates presence of reference, label and content
+* text_input :  
+  validates presence of reference, label
+* number_input :  
+  validates presence of reference, label
+* boolean :  
+  validates presence of reference, label
+* single_choice :
+  validates presence of reference, label and two answers
+  Valide la présence d'une référence, d'un label, et d'au moins une réponse.  
+* multiple_choice :  
+  validates presence of reference, label and two answers
 
-Implement an endpoint POST `localhost:3000/questionnaires` with body
+### Questionnaire validation
+* file must be YAML formatted
+* Each questionnaire element should have a type
+* Only types described above are allowed
+* Each element validates what is described above
 
-```
-{
-  payload:
-    CONTENT_OF_THE_JSON_EXAMPLE_FILE
-}
-```
-
-Store the data somewhere, we should be able to retrieve it using the root reference of the JSON example
-
-### 2. Make an API endpoint to retrieve the uploaded JSON
-
-Implement an endpoint GET `localhost:3000/questionnaires/:reference` to retrieve the content of the JSON store under the given `:reference`
-
-### 3. Implement validations over the content
-
-The content can be divided into the following types :
-- questionnaire :
-  should validate presence of `reference` and `content`. `content` should contain at least one slide
-- slide :
-  represents one "page" of questionnaire
-  should validate presence of `reference`, `label` and `content`. `content` should contain at least one of the following elements
-- text_input :
-  should validate presence of `reference` and `label`
-- number_input :
-  should validate presence of `reference` and `label`
-- boolean :
-  should validate presence of `reference` and `label`
-- single_choice :
-  should validate presence of `reference`, `label` and `content`. `content` should validate the presence of at least one response element
-- multiple_choice :
-  should validate presence of `reference`, `label` and `content`. `content` should validate the presence of at least one response element
-- response element :
-  should validate presence of `label` and `value`
-
-
-### 4. Alternative way to upload the data through YAML
-
-Create a page GET `localhost:3000/questionnaires/new` where you can select a file.
-You can then update the file and the content get store as JSON.
-The upload should only allow for YAML files (see given example).
-The YAML should be converted to JSON and stored.
+### Further
+We can discuss
+* Choice around questionnaire storage
+* How would we implement versionning on the questionnaire ?
